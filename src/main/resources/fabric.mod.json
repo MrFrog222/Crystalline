@@ -10,7 +10,7 @@
   "contact": {
     "sources": "https://github.com/MrFrog222/Crystalline"
   },
-  "icon": "assets/template/icon.png",
+  "icon": "assets/crystalline/icon.png",
   "environment": "client",
   "entrypoints": {
     "meteor": [
