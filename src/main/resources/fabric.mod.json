@@ -1,0 +1,36 @@
+{
+  "schemaVersion": 1,
+  "id": "crystalline",
+  "version": "${version}",
+  "name": "Crystalline",
+  "description": "Addon for Meteor Client mainly focusing on legit cpvp and general utility.",
+  "authors": [
+    "MrFrog222"
+  ],
+  "contact": {
+    "sources": "https://github.com/MrFrog222/Crystalline"
+  },
+  "icon": "assets/template/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "meteor": [
+      "com.mrfrog.crystalline.Crystalline"
+    ]
+  },
+  "mixins": [
+    "crystalline.mixins.json"
+  ],
+  "custom": {
+    "meteor-client:color": "225,25,25",
+    "modmenu": {
+      "parent": {
+        "id": "meteor-client"
+      }
+    }
+  },
+  "depends": {
+    "java": ">=${jdk_version}",
+    "minecraft": "${minecraft_version}",
+    "meteor-client": "*"
+  }
+}

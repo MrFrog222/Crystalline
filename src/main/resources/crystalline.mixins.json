@@ -1,0 +1,13 @@
+{
+  "required": true,
+  "package": "com.mrfrog.crystalline.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "client": [
+    "accessors.IKeyboardHandler",
+    "accessors.IKeyMapping",
+    "accessors.IMouseHandler"
+  ],
+  "injectors": {
+    "defaultRequire": 1
+  }
+}
