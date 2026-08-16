@@ -133,6 +133,7 @@ public class CrystalMacro extends Module {
         for (int i = 0; i < 9; i++) {
             if (mc.player.getInventory().getItem(i).getItem() != query && whitelist) continue;
             mc.player.getInventory().setSelectedSlot(i);
+            break;
         }
         if (mc.player.getInventory().getSelectedItem().getItem() == query && whitelist) active = true;
     }
@@ -155,6 +156,7 @@ public class CrystalMacro extends Module {
             for (int i = 0; i < 9; i++) {
                 if (!swords.contains(mc.player.getInventory().getItem(i).getItem())) continue;
                 mc.player.getInventory().setSelectedSlot(i);
+                break;
             }
             if (swords.contains(mc.player.getInventory().getSelectedItem().getItem())) autoHitActive = true;
         }

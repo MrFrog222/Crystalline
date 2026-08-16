@@ -17,6 +17,7 @@ public class Crystalline extends MeteorAddon {
         Modules.get().add(new AnchorMacro());
         Modules.get().add(new CrystalMacro());
         Modules.get().add(new AutoInvTotem());
+        Modules.get().add(new BlockMacro());
 
         Commands.add(new PunchingBagCommand());
     }

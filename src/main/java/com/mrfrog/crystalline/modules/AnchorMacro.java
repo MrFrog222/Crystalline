@@ -81,6 +81,7 @@ public class AnchorMacro extends Module {
         for (int i = 0; i < 9; i++) {
             if (mc.player.getInventory().getItem(i).getItem() != query && whitelist) continue;
             mc.player.getInventory().setSelectedSlot(i);
+            break;
         }
         if (mc.player.getInventory().getSelectedItem().getItem() == query && whitelist) active = true;
     }
