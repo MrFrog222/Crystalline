@@ -52,6 +52,13 @@ public class AnchorMacro extends Module {
         .build()
     );
 
+    private final Setting<Boolean> totemSwitch = sgGeneral.add(new BoolSetting.Builder()
+        .name("Totem Switch")
+        .description("Switches to totem after each anchor")
+        .defaultValue(true)
+        .build()
+    );
+
     public AnchorMacro() {
         super(Crystalline.PVP, "Anchor Macro", "Automatically anchors");
     }
@@ -60,7 +67,7 @@ public class AnchorMacro extends Module {
     private boolean active = false;
     private boolean simPress = false;
     private int betweenDelayCounter = 0;
-    private boolean setBetweenDelay = false;
+    private boolean anchorCompleted = false;
     private boolean pressedLastAnchor = false;
 
     @EventHandler
@@ -88,8 +95,9 @@ public class AnchorMacro extends Module {
                 int charge = blockState.getValue(RespawnAnchorBlock.CHARGE);
                 if(charge == 0) filterHotbar(Items.GLOWSTONE, true);
                 else {
-                    filterHotbar(Items.GLOWSTONE, false);
-                    setBetweenDelay = true;
+                    if (!totemSwitch.get()) filterHotbar(Items.GLOWSTONE, false);
+                    else filterHotbar(Items.TOTEM_OF_UNDYING, true);
+                    anchorCompleted = true;
                 }
             }else filterHotbar(Items.RESPAWN_ANCHOR, true);
         }
@@ -104,11 +112,11 @@ public class AnchorMacro extends Module {
 
         delayCounter = 0;
         active = false;
-        if(setBetweenDelay) {
+        if(anchorCompleted) {
             betweenDelayCounter = betweenDelay.get();
             pressedLastAnchor = true;
         }
-        setBetweenDelay = false;
+        anchorCompleted = false;
     }
 
     private void filterHotbar(Item query, boolean whitelist) {

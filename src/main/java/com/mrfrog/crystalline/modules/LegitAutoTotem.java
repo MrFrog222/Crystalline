@@ -18,7 +18,7 @@ import net.minecraft.world.inventory.ContainerInput;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
 
-public class AutoInvTotem extends Module {
+public class LegitAutoTotem extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
     private final SettingGroup sgAutoInv = settings.createGroup("Auto Inv");
 
@@ -56,8 +56,8 @@ public class AutoInvTotem extends Module {
         .build()
     );
 
-    public AutoInvTotem() {
-        super(Crystalline.PVP, "Auto Inv Totem", "Automatically equips totem in inventory");
+    public LegitAutoTotem() {
+        super(Crystalline.PVP, "Legit Auto Totem", "Automatically equips totems");
     }
 
     private boolean active = false;
