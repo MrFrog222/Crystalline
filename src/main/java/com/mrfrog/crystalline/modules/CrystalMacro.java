@@ -23,7 +23,7 @@ import java.util.Set;
 
 public class CrystalMacro extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
-    private final SettingGroup  sgAutoHit = settings.createGroup("Auto Hit");
+    private final SettingGroup sgAutoHit = settings.createGroup("Auto Hit");
 
     private final Setting<Keybind> key = sgGeneral.add(new KeybindSetting.Builder()
         .name("Key")
