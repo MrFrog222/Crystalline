@@ -95,8 +95,8 @@ public class AnchorMacro extends Module {
                 int charge = blockState.getValue(RespawnAnchorBlock.CHARGE);
                 if(charge == 0) filterHotbar(Items.GLOWSTONE, true);
                 else {
-                    if (!totemSwitch.get()) filterHotbar(Items.GLOWSTONE, false);
-                    else filterHotbar(Items.TOTEM_OF_UNDYING, true);
+                    if (totemSwitch.get()) filterHotbar(Items.TOTEM_OF_UNDYING, true);
+                    if(!active) filterHotbar(Items.GLOWSTONE, false);
                     anchorCompleted = true;
                 }
             }else filterHotbar(Items.RESPAWN_ANCHOR, true);
@@ -121,10 +121,10 @@ public class AnchorMacro extends Module {
 
     private void filterHotbar(Item query, boolean whitelist) {
         for (int i = 0; i < 9; i++) {
-            if (mc.player.getInventory().getItem(i).getItem() != query && whitelist) continue;
+            if ((mc.player.getInventory().getItem(i).getItem() == query) ^ whitelist) continue;
             mc.player.getInventory().setSelectedSlot(i);
             break;
         }
-        if (mc.player.getInventory().getSelectedItem().getItem() == query && whitelist) active = true;
+        if ((mc.player.getInventory().getSelectedItem().getItem() != query) ^ whitelist) active = true;
     }
 }

@@ -23,6 +23,7 @@ import java.util.Set;
 
 public class CrystalMacro extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
+    private final SettingGroup sgObbi = settings.createGroup("Place Obsidian");
     private final SettingGroup sgAutoHit = settings.createGroup("Auto Hit");
 
     private final Setting<Keybind> key = sgGeneral.add(new KeybindSetting.Builder()
@@ -32,9 +33,16 @@ public class CrystalMacro extends Module {
         .build()
     );
 
-    private final Setting<Boolean> placeObbi = sgGeneral.add(new BoolSetting.Builder()
+    private final Setting<Boolean> placeObbi = sgObbi.add(new BoolSetting.Builder()
         .name("Place Obsidian")
         .description("Place obsidian when looking at other blocks")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Boolean> oneObbi = sgObbi.add(new BoolSetting.Builder()
+        .name("One Obsidian")
+        .description("Limits obsidian placement to one per key press")
         .defaultValue(true)
         .build()
     );
@@ -89,6 +97,7 @@ public class CrystalMacro extends Module {
     private boolean hit = false;
     private boolean simHit = false;
     private boolean simUse = false;
+    private boolean obbiPlaced = false;
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
@@ -100,6 +109,7 @@ public class CrystalMacro extends Module {
             simUse = false;
         }
 
+        if(!key.get().isPressed()) obbiPlaced = false;
         if(!key.get().isPressed() || mc.player == null || mc.player.gameMode() == GameType.SPECTATOR || mc.screen != null || mc.hitResult == null) return;
 
         if(autoHit.get()) handleAutoHit();
@@ -108,7 +118,9 @@ public class CrystalMacro extends Module {
             if(mc.hitResult instanceof BlockHitResult blockHit) {
                 if(mc.level.getBlockState(blockHit.getBlockPos()).is(Blocks.OBSIDIAN) ||
                     mc.level.getBlockState(blockHit.getBlockPos()).is(Blocks.BEDROCK)) filterHotbar(Items.END_CRYSTAL, true);
-                else if(placeObbi.get()) filterHotbar(Items.OBSIDIAN, true);
+                else if(placeObbi.get() && (!obbiPlaced || !oneObbi.get())) {
+                    filterHotbar(Items.OBSIDIAN, true);
+                }
             }else if(mc.hitResult instanceof EntityHitResult entityHit && entityHit.getEntity() instanceof EndCrystal) hit = true;
         }
 
@@ -121,7 +133,8 @@ public class CrystalMacro extends Module {
             KeyUtil.simulatePress((IKeyMapping)mc.options.keyAttack,true);
             simHit = true;
         }
-        else {
+        else if(mc.player.getInventory().getSelectedItem().getItem() != Items.OBSIDIAN || (placeObbi.get() && (!obbiPlaced || !oneObbi.get()))) {
+            if(mc.player.getInventory().getSelectedItem().getItem() == Items.OBSIDIAN) obbiPlaced = true;
             KeyUtil.simulatePress((IKeyMapping)mc.options.keyUse,true);
             simUse = true;
         }
@@ -131,11 +144,11 @@ public class CrystalMacro extends Module {
 
     private void filterHotbar(Item query, boolean whitelist) {
         for (int i = 0; i < 9; i++) {
-            if (mc.player.getInventory().getItem(i).getItem() != query && whitelist) continue;
+            if ((mc.player.getInventory().getItem(i).getItem() == query) ^ whitelist) continue;
             mc.player.getInventory().setSelectedSlot(i);
             break;
         }
-        if (mc.player.getInventory().getSelectedItem().getItem() == query && whitelist) active = true;
+        if ((mc.player.getInventory().getSelectedItem().getItem() != query) ^ whitelist) active = true;
     }
 
     private final List<Item> swords = List.of(Items.STONE_SWORD, Items.COPPER_SWORD, Items.DIAMOND_SWORD, Items.GOLDEN_SWORD, Items.IRON_SWORD,

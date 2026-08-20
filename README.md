@@ -17,5 +17,5 @@
 - Download the [latest release](https://github.com/MrFrog222/Crystalline/releases/latest)  and put it into your mods folder
 
 ## Building from source\
-Linux `./gradlew  build`\
+Linux `./gradlew build`\
 Windows `./gradlew.bat build`

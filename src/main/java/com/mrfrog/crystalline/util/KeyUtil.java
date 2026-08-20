@@ -4,14 +4,14 @@ import com.mojang.blaze3d.platform.InputConstants;
 import com.mrfrog.crystalline.mixin.accessors.IKeyMapping;
 import com.mrfrog.crystalline.mixin.accessors.IKeyboardHandler;
 import com.mrfrog.crystalline.mixin.accessors.IMouseHandler;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.input.KeyEvent;
 import net.minecraft.client.input.MouseButtonInfo;
 import org.lwjgl.glfw.GLFW;
 
+import static meteordevelopment.meteorclient.MeteorClient.mc;
+
 public class KeyUtil {
     public static void simulatePress(IKeyMapping bind, boolean pressed) {
-        Minecraft mc = Minecraft.getInstance();
         IKeyboardHandler kbHandler = (IKeyboardHandler) mc.keyboardHandler;
         IMouseHandler mouseHandler = (IMouseHandler) mc.mouseHandler;
         InputConstants.Key key = bind.getKey();
