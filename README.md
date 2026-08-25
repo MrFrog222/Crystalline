@@ -6,15 +6,15 @@
 
 ## Features
 
-####Crystal Macro
+#### Crystal Macro
 Automatically places/breaks crystals with obsidian placement and auto hit
-####Anchor Macro
+#### Anchor Macro
 Automatically places and explodes anchors
-####Legit Auto Totem
+#### Legit Auto Totem
 Automatically replenishes totems in hotbar and offhand with auto double hand support
-####Pearl Hotkey
+#### Pearl Hotkey
 Throws a pearl automatically on hotkey
-####Block Macro
+#### Block Macro
 Automatically spams blocks on hotkey
 
 ## Installation
@@ -27,7 +27,7 @@ Linux `./gradlew build`\
 Windows `./gradlew.bat build`\
 The output will be in `build/libs`
 
-##Credits
+## Credits
 - [Meteor Client](https://meteorclient.com) for the base client and addon template
 - [Fabric](https://fabricmc.net) for the modloader
 - [Glazed](https://glazedclient.com) for inspiration and some implementation details
