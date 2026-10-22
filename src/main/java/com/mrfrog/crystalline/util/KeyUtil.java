@@ -1,35 +1,18 @@
 package com.mrfrog.crystalline.util;
 
-import com.mojang.blaze3d.platform.InputConstants;
 import com.mrfrog.crystalline.mixin.accessors.IKeyMapping;
-import com.mrfrog.crystalline.mixin.accessors.IKeyboardHandler;
-import com.mrfrog.crystalline.mixin.accessors.IMouseHandler;
-import net.minecraft.client.input.KeyEvent;
-import net.minecraft.client.input.MouseButtonInfo;
-import org.lwjgl.glfw.GLFW;
-
-import static meteordevelopment.meteorclient.MeteorClient.mc;
+import net.minecraft.client.KeyMapping;
 
 public class KeyUtil {
-    public static void simulatePress(IKeyMapping bind, boolean pressed) {
-        IKeyboardHandler kbHandler = (IKeyboardHandler) mc.keyboardHandler;
-        IMouseHandler mouseHandler = (IMouseHandler) mc.mouseHandler;
-        InputConstants.Key key = bind.getKey();
-        int action = pressed ? 1 : 0;
+    public static void simulatePress(KeyMapping bind, boolean pressed) {
+        IKeyMapping accessor = (IKeyMapping) bind;
 
-        switch(key.getType()) {
-            case KEYSYM:
-                kbHandler.invokeKeyPress(mc.getWindow().handle(), action, new KeyEvent(key.getValue(), 0, 0));
-                break;
-            case SCANCODE:
-                kbHandler.invokeKeyPress(mc.getWindow().handle(), action, new KeyEvent(GLFW.GLFW_KEY_UNKNOWN, key.getValue(), 0));
-                break;
-            case MOUSE:
-                mouseHandler.invokeOnButton(mc.getWindow().handle(), new MouseButtonInfo(key.getValue(), 0), action);
-                break;
-            default:
-                System.out.println("Invalid key mapping type!");
-                break;
+        if(pressed) {
+            bind.setDown(true);
+            accessor.setClickCount(accessor.getClickCount()+1);
+        }else {
+            accessor.setClickCount(0);
+            bind.setDown(false);
         }
     }
 }

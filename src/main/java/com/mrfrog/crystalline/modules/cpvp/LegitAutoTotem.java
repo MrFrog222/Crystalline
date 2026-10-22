@@ -1,7 +1,7 @@
-package com.mrfrog.crystalline.modules;
+package com.mrfrog.crystalline.modules.cpvp;
 
 import com.mrfrog.crystalline.Crystalline;
-import com.mrfrog.crystalline.mixin.accessors.IKeyMapping;
+import com.mrfrog.crystalline.util.InvUtil;
 import com.mrfrog.crystalline.util.KeyUtil;
 import meteordevelopment.meteorclient.events.game.OpenScreenEvent;
 import meteordevelopment.meteorclient.events.packets.PacketEvent;
@@ -32,6 +32,22 @@ public class LegitAutoTotem extends Module {
         .build()
     );
 
+    private final Setting<Boolean> autoDoubleHand = sgGeneral.add(new BoolSetting.Builder()
+        .name("Auto Double Hand")
+        .description("Automatically equips totem in main hand on pop")
+        .defaultValue(true)
+        .build()
+    );
+
+    private final Setting<Integer> doubleHandDelay = sgGeneral.add(new IntSetting.Builder()
+        .name("Double HandDelay")
+        .description("Delay in ticks before double-handing")
+        .defaultValue(0)
+        .min(0)
+        .sliderMax(20)
+        .build()
+    );
+
     private final Setting<Boolean> hotbar = sgHotbar.add(new BoolSetting.Builder()
         .name("Hotbar")
         .description("Replenishes hotbar totems as well")
@@ -49,8 +65,8 @@ public class LegitAutoTotem extends Module {
     );
 
     private final Setting<Integer> hotbarBetweenDelay = sgHotbar.add(new IntSetting.Builder()
-        .name("Delay")
-        .description("Delay in ticks before replenishing totem (beware that if this takes longer than the inv is open, it will fail)")
+        .name("Between Delay")
+        .description("Delay in ticks between replenishing totems (beware that if this takes longer than the inv is open, it will fail)")
         .defaultValue(1)
         .min(0)
         .sliderMax(20)
@@ -90,7 +106,7 @@ public class LegitAutoTotem extends Module {
     );
 
     public LegitAutoTotem() {
-        super(Crystalline.PVP, "Legit Auto Totem", "Automatically equips totems");
+        super(Crystalline.CPVP, "Legit Auto Totem", "Automatically equips totems");
     }
 
     //auto inv totem
@@ -111,6 +127,10 @@ public class LegitAutoTotem extends Module {
     private int closeDelayCounter = 0;
     private boolean invKeySim = false;
 
+    //double hand
+    private boolean doubleHandActive = false;
+    private int doubleHandCounter = 0;
+
     @EventHandler
     private void onScreenOpen(OpenScreenEvent event) {
         if(!(event.screen instanceof InventoryScreen) || mc.player.gameMode() == GameType.CREATIVE) return;
@@ -127,33 +147,50 @@ public class LegitAutoTotem extends Module {
     @EventHandler
     private void onPacketRecieve(PacketEvent.Receive event) {
         if(!(event.packet instanceof ClientboundEntityEventPacket packet) || packet.getEventId() != 35 || packet.getEntity(mc.level) != mc.player || !autoInv.get() ||
-            mc.screen != null) return;
-        if(mc.player.getInventory().getSelectedItem().getItem() == Items.TOTEM_OF_UNDYING && !hotbar.get()) return;
+            mc.gui.screen() != null) return;
+        if(mc.player.getInventory().getSelectedItem().getItem() == Items.TOTEM_OF_UNDYING) {if(!hotbar.get()) return;}
+        else doubleHandActive = true;
         openActive = true;
     }
 
     @EventHandler
     private void onTick(TickEvent.Pre event) {
+        if(autoDoubleHand.get()) handleDoubleHand();
         autoInv();
+        if(active) handleAutoTotem();
+        else handleHotbar();
+    }
 
-        if(active) {
-            if (delayCounter < delay.get()) {
-                delayCounter++;
-                return;
-            }
-            if (!(mc.screen instanceof InventoryScreen)) {
-                active = false;
-                delayCounter = 0;
-                return;
-            }
+    private void handleDoubleHand() {
+        if(!doubleHandActive) return;
+        if(doubleHandCounter < doubleHandDelay.get()) {
+            doubleHandCounter++;
+            return;
+        }
 
-            int slot = findTotem();
-            if (slot != -1) mc.gameMode.handleContainerInput(0, slot, 40, ContainerInput.SWAP, mc.player);
+        InvUtil.filterHotbar(Items.TOTEM_OF_UNDYING, true);
 
+        doubleHandActive = false;
+        doubleHandCounter = 0;
+    }
+
+    private void handleAutoTotem() {
+        if (delayCounter < delay.get()) {
+            delayCounter++;
+            return;
+        }
+        if (!(mc.gui.screen() instanceof InventoryScreen)) {
             active = false;
             delayCounter = 0;
-            if(!hotbarActive && invOpened) closeActive = true;
-        } else handleHotbar();
+            return;
+        }
+
+        int slot = findTotem();
+        if (slot != -1) mc.gameMode.handleContainerInput(0, slot, 40, ContainerInput.SWAP, mc.player);
+
+        active = false;
+        delayCounter = 0;
+        if(!hotbarActive && invOpened) closeActive = true;
     }
 
     private int findTotem() {
@@ -169,7 +206,7 @@ public class LegitAutoTotem extends Module {
 
     private void autoInv() {
         if(invKeySim) {
-            KeyUtil.simulatePress((IKeyMapping)mc.options.keyInventory, false);
+            KeyUtil.simulatePress(mc.options.keyInventory, false);
             invKeySim = false;
         }
 
@@ -184,7 +221,7 @@ public class LegitAutoTotem extends Module {
             return;
         }
 
-        KeyUtil.simulatePress((IKeyMapping)mc.options.keyInventory, true);
+        KeyUtil.simulatePress(mc.options.keyInventory, true);
         invKeySim = true;
 
         openDelayCounter = 0;
@@ -199,7 +236,7 @@ public class LegitAutoTotem extends Module {
             return;
         }
 
-        KeyUtil.simulatePress((IKeyMapping)mc.options.keyInventory, true);
+        KeyUtil.simulatePress(mc.options.keyInventory, true);
         invKeySim = true;
 
         closeDelayCounter = 0;
@@ -213,7 +250,7 @@ public class LegitAutoTotem extends Module {
             hotbarDelayCounter++;
             return;
         }
-        if (!(mc.screen instanceof InventoryScreen)) {
+        if (!(mc.gui.screen() instanceof InventoryScreen)) {
             hotbarActive = false;
             hotbarDelayCounter = 0;
             return;

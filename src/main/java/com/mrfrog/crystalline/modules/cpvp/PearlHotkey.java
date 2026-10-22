@@ -1,7 +1,7 @@
-package com.mrfrog.crystalline.modules;
+package com.mrfrog.crystalline.modules.cpvp;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mrfrog.crystalline.Crystalline;
-import com.mrfrog.crystalline.mixin.accessors.IKeyMapping;
 import com.mrfrog.crystalline.util.KeyUtil;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
@@ -10,7 +10,6 @@ import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.GameType;
-import org.lwjgl.glfw.GLFW;
 
 public class PearlHotkey extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -18,7 +17,7 @@ public class PearlHotkey extends Module {
     private final Setting<Keybind> key = sgGeneral.add(new KeybindSetting.Builder()
         .name("Key")
         .description("Hotkey to throw pearl")
-        .defaultValue(Keybind.fromKey(GLFW.GLFW_KEY_Q))
+        .defaultValue(Keybind.fromKey(InputConstants.KEY_Q))
         .build()
     );
 
@@ -48,7 +47,7 @@ public class PearlHotkey extends Module {
     );
 
     public PearlHotkey() {
-        super(Crystalline.PVP, "Pearl Hotkey", "Hotkey to switch to pearl and throw it");
+        super(Crystalline.CPVP, "Pearl Hotkey", "Hotkey to switch to pearl and throw it");
     }
 
     private boolean pressedLastTick = false;
@@ -61,10 +60,10 @@ public class PearlHotkey extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         if(pressSim) {
-            KeyUtil.simulatePress((IKeyMapping) mc.options.keyUse, false);
+            KeyUtil.simulatePress(mc.options.keyUse, false);
             pressSim = false;
         }
-        if(mc.player == null || mc.player.gameMode() == GameType.SPECTATOR || mc.screen != null) return;
+        if(mc.player == null || mc.player.gameMode() == GameType.SPECTATOR || mc.gui.screen() != null) return;
         boolean keyPressed = key.get().isPressed();
 
         if(keyPressed && !pressedLastTick) {
@@ -85,7 +84,7 @@ public class PearlHotkey extends Module {
             delayCounter++;
             return;
         }
-        KeyUtil.simulatePress((IKeyMapping) mc.options.keyUse, true);
+        KeyUtil.simulatePress(mc.options.keyUse, true);
         pressSim = true;
 
         if(switchBack.get()) {

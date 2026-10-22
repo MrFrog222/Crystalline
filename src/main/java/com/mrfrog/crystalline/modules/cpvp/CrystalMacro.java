@@ -1,7 +1,7 @@
-package com.mrfrog.crystalline.modules;
+package com.mrfrog.crystalline.modules.cpvp;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mrfrog.crystalline.Crystalline;
-import com.mrfrog.crystalline.mixin.accessors.IKeyMapping;
 import com.mrfrog.crystalline.util.InvUtil;
 import com.mrfrog.crystalline.util.KeyUtil;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -10,6 +10,7 @@ import meteordevelopment.meteorclient.systems.modules.Module;
 import meteordevelopment.meteorclient.utils.misc.Keybind;
 import meteordevelopment.orbit.EventHandler;
 import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.EntityTypes;
 import net.minecraft.world.entity.boss.enderdragon.EndCrystal;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.Items;
@@ -18,7 +19,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.EntityHitResult;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 import java.util.Set;
@@ -31,7 +31,7 @@ public class CrystalMacro extends Module {
     private final Setting<Keybind> key = sgGeneral.add(new KeybindSetting.Builder()
         .name("Key")
         .description("Macro bind")
-        .defaultValue(Keybind.fromButton(GLFW.GLFW_MOUSE_BUTTON_5))
+        .defaultValue(Keybind.fromButton(InputConstants.MOUSE_BUTTON_5))
         .build()
     );
 
@@ -107,12 +107,12 @@ public class CrystalMacro extends Module {
     private final Setting<Set<EntityType<?>>> autoHitEntities = sgAutoHit.add(new EntityTypeListSetting.Builder()
         .name("Entities")
         .description("Entities to hit")
-        .defaultValue(Set.of(EntityType.PLAYER))
+        .defaultValue(Set.of(EntityTypes.PLAYER))
         .build()
     );
 
     public CrystalMacro() {
-        super(Crystalline.PVP, "Crystal Macro", "Automatically crystals");
+        super(Crystalline.CPVP, "Crystal Macro", "Automatically crystals");
     }
 
     @EventHandler
@@ -123,7 +123,7 @@ public class CrystalMacro extends Module {
         if(autoHitBetweenCounter != 0 && autoHit.get()) autoHitBetweenCounter--;
         if(placeObbiBetweenCounter != 0 && placeObbi.get()) placeObbiBetweenCounter--;
 
-        if(!key.get().isPressed() || mc.player == null || mc.player.gameMode() == GameType.SPECTATOR || mc.screen != null || mc.hitResult == null) return;
+        if(!key.get().isPressed() || mc.player == null || mc.player.gameMode() == GameType.SPECTATOR || mc.gui.screen() != null || mc.hitResult == null) return;
 
         if(!placeActive && !explodeActive && !placeObbiActive && !autoHitActive) {
             if(mc.hitResult instanceof BlockHitResult blockHit) {
@@ -242,8 +242,8 @@ public class CrystalMacro extends Module {
     }
 
     private boolean useDown = false;
-    private void use(boolean down) {KeyUtil.simulatePress((IKeyMapping)mc.options.keyUse, down); useDown = down;}
+    private void use(boolean down) {KeyUtil.simulatePress(mc.options.keyUse, down); useDown = down;}
 
     private boolean hitDown = false;
-    private void hit(boolean down) {KeyUtil.simulatePress((IKeyMapping)mc.options.keyAttack, down); hitDown = down;}
+    private void hit(boolean down) {KeyUtil.simulatePress(mc.options.keyAttack, down); hitDown = down;}
 }

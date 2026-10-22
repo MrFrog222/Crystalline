@@ -1,7 +1,7 @@
-package com.mrfrog.crystalline.modules;
+package com.mrfrog.crystalline.modules.cpvp;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mrfrog.crystalline.Crystalline;
-import com.mrfrog.crystalline.mixin.accessors.IKeyMapping;
 import com.mrfrog.crystalline.util.KeyUtil;
 import meteordevelopment.meteorclient.events.world.TickEvent;
 import meteordevelopment.meteorclient.settings.*;
@@ -13,7 +13,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.level.GameType;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
-import org.lwjgl.glfw.GLFW;
 
 import java.util.List;
 
@@ -23,7 +22,7 @@ public class BlockMacro extends Module {
     private final Setting<Keybind> key = sgGeneral.add(new KeybindSetting.Builder()
         .name("Key")
         .description("Macro bind")
-        .defaultValue(Keybind.fromKey(GLFW.GLFW_KEY_R))
+        .defaultValue(Keybind.fromKey(InputConstants.KEY_R))
         .build()
     );
 
@@ -44,7 +43,7 @@ public class BlockMacro extends Module {
     );
 
     public BlockMacro() {
-        super(Crystalline.PVP, "Block Macro", "Automatically places blocks");
+        super(Crystalline.CPVP, "Block Macro", "Automatically places blocks");
     }
 
     private boolean active = false;
@@ -54,11 +53,11 @@ public class BlockMacro extends Module {
     @EventHandler
     private void onTick(TickEvent.Pre event) {
         if(useSim) {
-            KeyUtil.simulatePress((IKeyMapping)mc.options.keyUse, false);
+            KeyUtil.simulatePress(mc.options.keyUse, false);
             useSim = false;
         }
 
-        if(!key.get().isPressed() || mc.player == null || mc.screen != null || mc.player.gameMode() == GameType.SPECTATOR) return;
+        if(!key.get().isPressed() || mc.player == null || mc.gui.screen() != null || mc.player.gameMode() == GameType.SPECTATOR) return;
 
         if(!active) {
             for(int i = 0; i < 9; i++) {
@@ -75,7 +74,7 @@ public class BlockMacro extends Module {
             return;
         }
 
-        KeyUtil.simulatePress((IKeyMapping)mc.options.keyUse, true);
+        KeyUtil.simulatePress(mc.options.keyUse, true);
         useSim = true;
 
         active = false;

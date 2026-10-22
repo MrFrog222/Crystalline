@@ -1,7 +1,7 @@
-package com.mrfrog.crystalline.modules;
+package com.mrfrog.crystalline.modules.cpvp;
 
+import com.mojang.blaze3d.platform.InputConstants;
 import com.mrfrog.crystalline.Crystalline;
-import com.mrfrog.crystalline.mixin.accessors.IKeyMapping;
 import com.mrfrog.crystalline.util.InvUtil;
 import com.mrfrog.crystalline.util.KeyUtil;
 import meteordevelopment.meteorclient.events.world.TickEvent;
@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RespawnAnchorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import org.lwjgl.glfw.GLFW;
 
 public class AnchorMacro extends Module {
     private final SettingGroup sgGeneral = settings.getDefaultGroup();
@@ -24,7 +23,7 @@ public class AnchorMacro extends Module {
     private final Setting<Keybind> key = sgGeneral.add(new KeybindSetting.Builder()
         .name("Key")
         .description("Macro bind")
-        .defaultValue(Keybind.fromButton(GLFW.GLFW_MOUSE_BUTTON_4))
+        .defaultValue(Keybind.fromButton(InputConstants.MOUSE_BUTTON_4))
         .build()
     );
 
@@ -77,7 +76,7 @@ public class AnchorMacro extends Module {
     );
 
     public AnchorMacro() {
-        super(Crystalline.PVP, "Anchor Macro", "Automatically anchors");
+        super(Crystalline.CPVP, "Anchor Macro", "Automatically anchors");
     }
 
     private boolean pressedLastTick = false;
@@ -94,7 +93,7 @@ public class AnchorMacro extends Module {
         pressedLastAnchor = false;
 
         if(!key.get().isPressed() || mc.player == null || mc.player.gameMode() == GameType.SPECTATOR ||
-            mc.screen != null || !(mc.hitResult instanceof BlockHitResult hitResult)) return;
+            mc.gui.screen() != null || !(mc.hitResult instanceof BlockHitResult hitResult)) return;
 
         if(!placeActive && !chargeActive && !explodeActive) {
             BlockState blockState = mc.level.getBlockState(hitResult.getBlockPos());
@@ -189,5 +188,5 @@ public class AnchorMacro extends Module {
     }
 
     private boolean useDown = false;
-    private void use(boolean down) {KeyUtil.simulatePress((IKeyMapping)mc.options.keyUse, down); useDown = down;}
+    private void use(boolean down) {KeyUtil.simulatePress(mc.options.keyUse, down); useDown = down;}
 }
